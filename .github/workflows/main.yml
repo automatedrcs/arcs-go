@@ -1,0 +1,32 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Build Docker image
+      run: docker build -t gcr.io/$PROJECT_ID/myapp:$GITHUB_SHA .
+
+    - name: Configure gcloud
+      uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      with:
+        version: '290.0.1'
+        service_account_key: ${{ secrets.GCLOUD_AUTH }}
+
+    - name: Push Docker image to GCR
+      run: |
+        gcloud auth configure-docker
+        docker push gcr.io/$PROJECT_ID/myapp:$GITHUB_SHA
+
+    - name: Deploy to GKE
+      run: |
+        kubectl set image deployment/myapp-deployment myapp=gcr.io/$PROJECT_ID/myapp:$GITHUB_SHA
