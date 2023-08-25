@@ -1,0 +1,308 @@
+{
+  "version": 4,
+  "terraform_version": "1.5.6",
+  "serial": 19,
+  "lineage": "153744fe-1d6a-a5ba-d7f6-28c5efa055f4",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "data",
+      "type": "google_secret_manager_secret_version",
+      "name": "db_password",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "create_time": "2023-08-25T03:12:23.861145Z",
+            "destroy_time": null,
+            "enabled": true,
+            "id": "projects/994970677374/secrets/arcs-db-password/versions/1",
+            "name": "projects/994970677374/secrets/arcs-db-password/versions/1",
+            "project": "arcs-391022",
+            "secret": "arcs-db-password",
+            "secret_data": "OL1nbass47WWOnv",
+            "version": "1"
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_compute_global_address",
+      "name": "private_range",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "address": "10.223.0.0",
+            "address_type": "INTERNAL",
+            "creation_timestamp": "2023-08-25T00:19:51.598-07:00",
+            "description": "",
+            "id": "projects/arcs-391022/global/addresses/private-range",
+            "ip_version": "",
+            "name": "private-range",
+            "network": "https://www.googleapis.com/compute/v1/projects/arcs-391022/global/networks/arcs-vpc",
+            "prefix_length": 16,
+            "project": "arcs-391022",
+            "purpose": "VPC_PEERING",
+            "self_link": "https://www.googleapis.com/compute/v1/projects/arcs-391022/global/addresses/private-range",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDB9fQ==",
+          "dependencies": [
+            "google_compute_network.custom_vpc"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_compute_network",
+      "name": "custom_vpc",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "auto_create_subnetworks": false,
+            "delete_default_routes_on_create": false,
+            "description": "Custom VPC for our infrastructure",
+            "enable_ula_internal_ipv6": false,
+            "gateway_ipv4": "",
+            "id": "projects/arcs-391022/global/networks/arcs-vpc",
+            "internal_ipv6_range": "",
+            "mtu": 0,
+            "name": "arcs-vpc",
+            "network_firewall_policy_enforcement_order": "AFTER_CLASSIC_FIREWALL",
+            "project": "arcs-391022",
+            "routing_mode": "REGIONAL",
+            "self_link": "https://www.googleapis.com/compute/v1/projects/arcs-391022/global/networks/arcs-vpc",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH19"
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_compute_subnetwork",
+      "name": "custom_subnet",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "creation_timestamp": "2023-08-25T00:19:53.601-07:00",
+            "description": "",
+            "external_ipv6_prefix": "",
+            "fingerprint": null,
+            "gateway_address": "10.0.0.1",
+            "id": "projects/arcs-391022/regions/us-west1/subnetworks/arcs-subnet",
+            "ip_cidr_range": "10.0.0.0/16",
+            "ipv6_access_type": "",
+            "ipv6_cidr_range": "",
+            "log_config": [],
+            "name": "arcs-subnet",
+            "network": "https://www.googleapis.com/compute/v1/projects/arcs-391022/global/networks/arcs-vpc",
+            "private_ip_google_access": false,
+            "private_ipv6_google_access": "DISABLE_GOOGLE_ACCESS",
+            "project": "arcs-391022",
+            "purpose": "PRIVATE",
+            "region": "us-west1",
+            "role": "",
+            "secondary_ip_range": [],
+            "self_link": "https://www.googleapis.com/compute/v1/projects/arcs-391022/regions/us-west1/subnetworks/arcs-subnet",
+            "stack_type": "IPV4_ONLY",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "google_compute_network.custom_vpc"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_container_cluster",
+      "name": "primary",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "addons_config": null,
+            "allow_net_admin": null,
+            "authenticator_groups_config": null,
+            "binary_authorization": [],
+            "cluster_autoscaling": null,
+            "cluster_ipv4_cidr": null,
+            "confidential_nodes": null,
+            "cost_management_config": null,
+            "database_encryption": null,
+            "datapath_provider": null,
+            "default_max_pods_per_node": null,
+            "default_snat_status": null,
+            "description": null,
+            "dns_config": [],
+            "enable_autopilot": null,
+            "enable_binary_authorization": false,
+            "enable_intranode_visibility": null,
+            "enable_k8s_beta_apis": [],
+            "enable_kubernetes_alpha": false,
+            "enable_l4_ilb_subsetting": false,
+            "enable_legacy_abac": false,
+            "enable_shielded_nodes": true,
+            "enable_tpu": null,
+            "endpoint": null,
+            "gateway_api_config": null,
+            "id": "projects/arcs-391022/locations/us-west1/clusters/arcs-go-cluster",
+            "initial_node_count": 1,
+            "ip_allocation_policy": [
+              {
+                "cluster_ipv4_cidr_block": "",
+                "cluster_secondary_range_name": "",
+                "pod_cidr_overprovision_config": [],
+                "services_ipv4_cidr_block": "",
+                "services_secondary_range_name": "",
+                "stack_type": "IPV4"
+              }
+            ],
+            "label_fingerprint": null,
+            "location": "us-west1",
+            "logging_config": null,
+            "logging_service": "logging.googleapis.com/kubernetes",
+            "maintenance_policy": [],
+            "master_auth": [
+              {
+                "client_certificate": "",
+                "client_certificate_config": [
+                  {
+                    "issue_client_certificate": false
+                  }
+                ],
+                "client_key": "",
+                "cluster_ca_certificate": ""
+              }
+            ],
+            "master_authorized_networks_config": [
+              {
+                "cidr_blocks": [
+                  {
+                    "cidr_block": "192.168.0.0/24",
+                    "display_name": "My network"
+                  }
+                ],
+                "gcp_public_cidrs_access_enabled": false
+              }
+            ],
+            "master_version": null,
+            "mesh_certificates": null,
+            "min_master_version": null,
+            "monitoring_config": null,
+            "monitoring_service": "monitoring.googleapis.com/kubernetes",
+            "name": "arcs-go-cluster",
+            "network": "arcs-vpc",
+            "network_policy": [],
+            "networking_mode": null,
+            "node_config": null,
+            "node_locations": [],
+            "node_pool": null,
+            "node_pool_defaults": null,
+            "node_version": null,
+            "notification_config": null,
+            "operation": "operation-1692949163592-30710b62-1e4a-4d11-81ff-41b0f8a36b03",
+            "private_cluster_config": [
+              {
+                "enable_private_endpoint": true,
+                "enable_private_nodes": true,
+                "master_global_access_config": [],
+                "master_ipv4_cidr_block": "172.16.0.0/28",
+                "peering_name": "",
+                "private_endpoint": "",
+                "private_endpoint_subnetwork": "",
+                "public_endpoint": ""
+              }
+            ],
+            "private_ipv6_google_access": null,
+            "project": null,
+            "release_channel": null,
+            "remove_default_node_pool": true,
+            "resource_labels": null,
+            "resource_usage_export_config": [],
+            "security_posture_config": null,
+            "self_link": null,
+            "service_external_ips_config": null,
+            "services_ipv4_cidr": null,
+            "subnetwork": "arcs-subnet",
+            "timeouts": null,
+            "tpu_ipv4_cidr_block": null,
+            "vertical_pod_autoscaling": null,
+            "workload_identity_config": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoyNDAwMDAwMDAwMDAwLCJkZWxldGUiOjI0MDAwMDAwMDAwMDAsInJlYWQiOjI0MDAwMDAwMDAwMDAsInVwZGF0ZSI6MzYwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMSJ9",
+          "dependencies": [
+            "google_compute_network.custom_vpc",
+            "google_compute_subnetwork.custom_subnet"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_container_node_pool",
+      "name": "primary_nodes",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": []
+    },
+    {
+      "mode": "managed",
+      "type": "google_service_networking_connection",
+      "name": "private_vpc_connection",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "https%3A%2F%2Fwww.googleapis.com%2Fcompute%2Fv1%2Fprojects%2Farcs-391022%2Fglobal%2Fnetworks%2Farcs-vpc:servicenetworking.googleapis.com",
+            "network": "https://www.googleapis.com/compute/v1/projects/arcs-391022/global/networks/arcs-vpc",
+            "peering": "servicenetworking-googleapis-com",
+            "reserved_peering_ranges": [
+              "private-range"
+            ],
+            "service": "servicenetworking.googleapis.com",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6NjAwMDAwMDAwMDAwLCJ1cGRhdGUiOjYwMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "google_compute_global_address.private_range",
+            "google_compute_network.custom_vpc"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_sql_database",
+      "name": "default",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": []
+    },
+    {
+      "mode": "managed",
+      "type": "google_sql_user",
+      "name": "default",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": []
+    }
+  ],
+  "check_results": null
+}

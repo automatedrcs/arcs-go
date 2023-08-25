@@ -1,24 +1,31 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgresql-deployment
+  name: arcs-go-deployment
+  labels:
+    app: arcs-go
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
-      app: postgresql
+      app: arcs-go
   template:
     metadata:
       labels:
-        app: postgresql
+        app: arcs-go
     spec:
       containers:
-      - name: postgresql
-        image: postgres:latest
+      - name: arcs-go
+        image: gcr.io/arcs-391022/arcs-go:latest
+        ports:
+        - containerPort: 8080
         env:
-        - name: POSTGRES_USER
-          value: "user"
-        - name: POSTGRES_PASSWORD
-          value: "password"
-        - name: POSTGRES_DB
-          value: "mydatabase"
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /var/secrets/google/key.json
+        volumeMounts:
+        - name: google-cloud-key
+          mountPath: /var/secrets/google
+      volumes:
+      - name: google-cloud-key
+        secret:
+          secretName: k8s-secret
