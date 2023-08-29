@@ -30,3 +30,16 @@ func ConnectToDatabase() (*sql.DB, error) {
 
 	return db, nil
 }
+
+type Database interface {
+	Query(query string, args ...interface{}) (*sql.Rows, error)
+	// add other methods you might need like QueryRow, Exec, etc.
+}
+
+type DBImplementation struct {
+	db *sql.DB
+}
+
+func (dbi *DBImplementation) Query(query string, args ...interface{}) (*sql.Rows, error) {
+	return dbi.db.Query(query, args...)
+}
