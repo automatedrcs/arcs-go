@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql" // Import sql package
 	"log"
 	"net/http"
 
@@ -9,24 +8,39 @@ import (
 	"github.com/automatedrcs/arcs-go/db"
 )
 
-var dbConnection *sql.DB
+// Global DBConnector
+var connector db.DBConnector = &db.RealDBConnector{}
 
 func main() {
-	var err error
-	dbConnection, err := db.ConnectToDatabase()
+	// Setup routes
+	setupRoutes()
+
+	// Listen and serve
+	log.Println("Starting server on :8080...")
+	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
+func setupRoutes() {
+	http.HandleFunc("/auth/google/login", auth.HandleGoogleAuth)
+	http.HandleFunc("/auth/google/callback", auth.HandleGoogleCallback)
+	http.HandleFunc("/health", healthCheck)
+}
+
+// A simple health check endpoint
+func healthCheck(w http.ResponseWriter, r *http.Request) {
+	dbConnection, err := connector.ConnectToDatabase()
 	if err != nil {
-		log.Fatalf("Failed to connect to the database: %v", err)
+		http.Error(w, "Database connection error", http.StatusInternalServerError)
+		return
 	}
 	defer dbConnection.Close()
 
-	// Test the database connection
 	err = dbConnection.Ping()
 	if err != nil {
-		log.Fatalf("Failed to ping the database: %v", err)
+		http.Error(w, "Database ping failed", http.StatusInternalServerError)
+		return
 	}
 
-	http.HandleFunc("/auth/google/login", auth.HandleGoogleAuth)
-	http.HandleFunc("/auth/google/callback", auth.HandleGoogleCallback)
-
-	http.ListenAndServe(":8080", nil)
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("OK"))
 }

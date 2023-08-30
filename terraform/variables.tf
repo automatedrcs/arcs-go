@@ -25,10 +25,3 @@ variable "database_user" {
   type        = string
   default     = "arcs_user"
 }
-
-# Be careful with this; avoid putting passwords directly in code.
-variable "database_password" {
-  description = "The password of the SQL database user."
-  type        = string
-  sensitive   = true
-}

@@ -8,7 +8,13 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func ConnectToDatabase() (*sql.DB, error) {
+type DBConnector interface {
+	ConnectToDatabase() (*sql.DB, error)
+}
+
+type realDBConnector struct{}
+
+func (r *realDBConnector) ConnectToDatabase() (*sql.DB, error) {
 	host, err := secrets.Get("CLOUD_SQL_PRIVATE_IP")
 	if err != nil {
 		return nil, fmt.Errorf("failed to retrieve cloud sql private IP: %v", err)
@@ -31,6 +37,10 @@ func ConnectToDatabase() (*sql.DB, error) {
 	return db, nil
 }
 
+func NewRealDBConnector() DBConnector {
+	return &realDBConnector{}
+}
+
 type Database interface {
 	Query(query string, args ...interface{}) (*sql.Rows, error)
 	// add other methods you might need like QueryRow, Exec, etc.
@@ -42,4 +52,9 @@ type DBImplementation struct {
 
 func (dbi *DBImplementation) Query(query string, args ...interface{}) (*sql.Rows, error) {
 	return dbi.db.Query(query, args...)
+}
+
+// This can be used to initialize the DBImplementation struct
+func NewDBImplementation(db *sql.DB) Database {
+	return &DBImplementation{db: db}
 }

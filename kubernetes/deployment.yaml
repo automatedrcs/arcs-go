@@ -14,9 +14,10 @@ spec:
       labels:
         app: arcs-go
     spec:
+      serviceAccountName: arcs-go-k8s-service-account # Specify the service account
       containers:
       - name: arcs-go
-        image: gcr.io/arcs-391022/arcs-go:latest
+        image: gcr.io/arcs-391022/arcs-go:$COMMIT_SHA
         ports:
         - containerPort: 8080
         env:

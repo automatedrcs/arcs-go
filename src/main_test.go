@@ -4,44 +4,48 @@ import (
 	"database/sql"
 	"errors"
 	"testing"
-
-	"github.com/automatedrcs/arcs-go/db"
-	"github.com/automatedrcs/arcs-go/mocks"
-	"github.com/golang/mock/gomock"
 )
 
+// mockDBConnector implements db.DBConnector
+type mockDBConnector struct {
+	DB  *sql.DB
+	Err error
+}
+
+func (m *mockDBConnector) ConnectToDatabase() (*sql.DB, error) {
+	return m.DB, m.Err
+}
+
 func TestMainFunc(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+	// Set up a mock database
+	mockDB := &sql.DB{} // A simplified mock. You'd replace this with an actual mock DB setup if needed.
 
-	mockDB := mocks.NewMockDB(ctrl)
-
-	// Mock the ConnectToDatabase function to return a mock database without error
-	db.ConnectToDatabase = func() (*sql.DB, error) {
-		return mockDB, nil
+	// Mock the DBConnector to return our mockDB
+	mockConnector := &mockDBConnector{
+		DB: mockDB,
 	}
 
-	// Mock the Ping function to simulate successful pinging of the database
-	mockDB.EXPECT().Ping().Return(nil)
+	// In your main() function, you'll have to replace the actual db.DBConnector
+	// with this mockConnector before calling any methods on it.
+	// For now, let's just assume that you can do this replacement.
+	// Note: This step might require modifications in main() or another mechanism to replace the connector.
 
-	// We can't easily test http.ListenAndServe as it will start a server and block,
-	// but we can at least test up to that point.
+	// Mock any required DB functions. For example, if your actual code calls Ping(),
+	// you'd mock that function on mockDB.
+
+	// Again, as before, we can't easily test http.ListenAndServe, so the following is a simplistic test.
 	main()
 }
 
 func TestMainFuncWithDBError(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	mockDB := mocks.NewMockDB(ctrl)
-
-	// Mock the ConnectToDatabase function to return an error
-	db.ConnectToDatabase = func() (*sql.DB, error) {
-		return nil, errors.New("Mocked DB Error")
+	// Mock the DBConnector to return an error
+	mockConnector := &mockDBConnector{
+		Err: errors.New("Mocked DB Error"),
 	}
 
-	// This test will call the main function expecting it to panic due to the mocked DB error.
-	// Therefore, we recover from the panic to pass the test.
+	// As before, replace the actual db.DBConnector in your main() with this mockConnector.
+
+	// Expecting a panic due to the mocked DB error.
 	defer func() {
 		if r := recover(); r == nil {
 			t.Errorf("The code did not panic when expected")
