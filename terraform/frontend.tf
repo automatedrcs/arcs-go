@@ -1,16 +1,13 @@
-
 resource "google_cloud_run_service" "frontend" {
   name     = "arcs-fe"
   location = var.region
 
   template {
     spec {
-      service_account_name = "your-service-account@email.com"  # Replace with your service account name
+      service_account_name = google_service_account.frontend.email
       containers {
-        image = "gcr.io/${var.project_id}/arcs-fe:${var.commit_sha}"  # Using the commit SHA for versioning
+        image = "gcr.io/${var.project_id}/arcs-fe:${var.commit_sha}"
       }
-
-      vpc_connector_name = google_vpc_access_connector.connector.name
     }
   }
 
@@ -26,12 +23,13 @@ resource "google_service_account" "frontend" {
 }
 
 resource "google_project_iam_member" "frontend-invoker" {
+  project = var.project_id
   role   = "roles/run.invoker"
   member = "serviceAccount:${google_service_account.frontend.email}"
 }
 
-// Optionally, if you want to give it the Cloud Run Admin role:
 resource "google_project_iam_member" "frontend-admin" {
+  project = var.project_id
   role   = "roles/run.admin"
   member = "serviceAccount:${google_service_account.frontend.email}"
 }

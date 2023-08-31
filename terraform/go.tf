@@ -1,3 +1,13 @@
+data "google_client_config" "default" {
+  depends_on = [google_container_cluster.primary]
+}
+
+provider "kubernetes" {
+  host                   = "https://${google_container_cluster.primary.endpoint}"
+  token                  = data.google_client_config.default.access_token
+  cluster_ca_certificate = base64decode(google_container_cluster.primary.master_auth[0].cluster_ca_certificate)
+}
+
 resource "google_container_cluster" "primary" {
   name               = var.cluster_name
   location           = var.region
@@ -66,10 +76,6 @@ resource "google_container_node_pool" "primary_nodes" {
 
 resource "google_cloudbuild_trigger" "go_api" {
   description = "Trigger for the Go-based web API"
-  trigger_template {
-    repo_name   = "arcs-go"
-    branch_name = "main"
-  }
 
   github {
     owner = "automatedrcs"
@@ -83,7 +89,7 @@ resource "google_cloudbuild_trigger" "go_api" {
   filename = "cloudbuild.yaml"
 
   substitutions = {
-    _GKE_ZONE         = "us-central1" # or your specific GKE zone
+    _GKE_ZONE         = "us-central1"
     _GKE_CLUSTER_NAME = "arcs-go-cluster"
   }
 }
@@ -94,6 +100,7 @@ resource "google_service_account" "arcs_go" {
 }
 
 resource "google_project_iam_member" "arcs_go_gke_developer" {
+  project = var.project_id
   role   = "roles/container.developer"
   member = "serviceAccount:${google_service_account.arcs_go.email}"
 }
@@ -111,5 +118,61 @@ resource "kubernetes_service_account" "arcs_go_k8s_sa" {
     annotations = {
       "iam.gke.io/gcp-service-account" = google_service_account.arcs_go.email
     }
+  }
+}
+
+resource "kubernetes_deployment" "api_deployment" {
+  metadata {
+    name      = "api-deployment"
+    namespace = kubernetes_namespace.arcs_go_namespace.metadata[0].name
+  }
+
+  spec {
+    replicas = 2
+
+    selector {
+      match_labels = {
+        app = "api"
+      }
+    }
+
+    template {
+      metadata {
+        labels = {
+          app = "api"
+        }
+      }
+
+      spec {
+        container {
+          name  = "api"
+          image = "gcr.io/${var.project_id}/arcs-go:${data.github_commit.this.sha}"
+
+          port {
+            container_port = 8080
+          }
+        }
+      }
+    }
+  }
+}
+
+resource "kubernetes_service" "api_service" {
+  metadata {
+    name      = "api-service"
+    namespace = kubernetes_namespace.arcs_go_namespace.metadata[0].name
+  }
+
+  spec {
+    selector = {
+      app = "api"
+    }
+
+    port {
+      port        = 80
+      target_port = 8080
+    }
+
+    type = "LoadBalancer"
   }
 }

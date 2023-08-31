@@ -36,6 +36,17 @@ resource "google_compute_vpn_gateway" "gateway" {
   network = google_compute_network.custom_vpc.name
 }
 
+resource "google_compute_forwarding_rule" "udp_4500_rule" {
+  name        = "vpn-forwarding-rule-udp4500"
+  description = "Forwarding rule for VPN on UDP 4500"
+  region      = "us-central1" # or your desired region
+  ip_protocol = "UDP"
+  port_range  = "4500"
+  target      = google_compute_vpn_gateway.gateway.self_link
+  load_balancing_scheme = "EXTERNAL"
+  ip_address             = google_compute_address.vpn.address
+}
+
 resource "google_compute_forwarding_rule" "fr" {
   name        = "vpn-forwarding-rule"
   region      = var.region
@@ -56,7 +67,11 @@ resource "google_compute_vpn_tunnel" "tunnel" {
   shared_secret      = local.vpn_shared_key
   peer_ip            = "73.15.169.24"
   ike_version        = 2
+  
+  local_traffic_selector  = ["10.0.0.0/16"]
+  remote_traffic_selector = ["192.168.0.0/24"]
 }
+
 
 resource "google_compute_address" "vpn" {
   name   = "vpn-address"
@@ -69,3 +84,16 @@ resource "google_vpc_access_connector" "connector" {
   network       = google_compute_network.custom_vpc.name
   ip_cidr_range = "10.8.0.0/28" 
 }
+
+resource "google_compute_forwarding_rule" "vpn_gateway_rule" {
+  name                   = "vpn-gateway-rule"
+  region                 = var.region
+  target                 = google_compute_vpn_gateway.gateway.self_link
+  ip_protocol            = "UDP"
+  port_range             = "500-500"
+  load_balancing_scheme  = "EXTERNAL"
+  network_tier           = "PREMIUM"
+  description            = "Forwarding rule for VPN Gateway on UDP:500"
+  ip_address             = google_compute_address.vpn.address
+}
+

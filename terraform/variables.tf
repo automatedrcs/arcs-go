@@ -25,3 +25,8 @@ variable "database_user" {
   type        = string
   default     = "arcs_user"
 }
+
+variable "commit_sha" {
+  description = "The commit SHA for versioning."
+  default     = "latest"
+}
