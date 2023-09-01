@@ -37,11 +37,14 @@ resource "google_container_cluster" "primary" {
     }
   }
 
-
   master_auth {
     client_certificate_config {
       issue_client_certificate = false
     }
+  }
+
+  workload_identity_config {
+    identity_namespace = "${var.project_id}.svc.id.goog"
   }
 
   logging_service    = "logging.googleapis.com/kubernetes"
@@ -55,9 +58,9 @@ resource "google_container_node_pool" "primary_nodes" {
   node_count = 1  # We set the node_count to 1 since we want one node in each zone
 
   node_locations = [   # Specify the zones where you want your nodes
-    "${var.region}-a",
-    "${var.region}-b",
-    "${var.region}-c"
+    "${var.region}-d",
+    "${var.region}-e",
+    "${var.region}-f"
   ]
 
   node_config {
@@ -121,6 +124,18 @@ resource "kubernetes_service_account" "arcs_go_k8s_sa" {
   }
 }
 
+resource "google_storage_bucket_iam_member" "gcr_image_viewer" {
+  bucket = "artifacts.${var.project_id}.appspot.com" # This is typically the GCR bucket name format
+  role   = "roles/storage.objectViewer"
+  member = "serviceAccount:${google_service_account.arcs_go.email}"
+}
+
+resource "google_service_account_iam_member" "workload_identity_user" {
+  service_account_id = google_service_account.arcs_go.name
+  role               = "roles/iam.workloadIdentityUser"
+  member             = "serviceAccount:${var.project_id}.svc.id.goog[arcs-go-namespace/arcs-go-k8s-service-account]"
+}
+
 resource "kubernetes_deployment" "api_deployment" {
   metadata {
     name      = "api-deployment"
@@ -145,6 +160,8 @@ resource "kubernetes_deployment" "api_deployment" {
 
       spec {
         container {
+          service_account_name = kubernetes_service_account.arcs_go_k8s_sa.metadata[0].name
+
           name  = "api"
           image = "gcr.io/${var.project_id}/arcs-go:${var.commit_sha}"
 
