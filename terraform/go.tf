@@ -146,7 +146,7 @@ resource "kubernetes_deployment" "api_deployment" {
       spec {
         container {
           name  = "api"
-          image = "gcr.io/${var.project_id}/arcs-go:${data.github_commit.this.sha}"
+          image = "gcr.io/${var.project_id}/arcs-go:${var.commit_sha}"
 
           port {
             container_port = 8080
